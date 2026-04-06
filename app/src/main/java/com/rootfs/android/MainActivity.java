@@ -430,8 +430,8 @@ private void logProcessOutput(Process process) {
                 "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/libtalloc.so.2",
                 "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/proot",
                 "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/alpine-minirootfs-3.21.0-aarch64.tar.gz",
-				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/sho.sh",
-				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/shgs.sh"
+				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/setup.sh",
+				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/init.sh"
         });
 
         String[] urls = map.get(abi);
@@ -446,8 +446,8 @@ private void logProcessOutput(Process process) {
         list.add(new SetupEnvironment.FileItem(urls[0], new File(base, "libtalloc.so.2")));
         list.add(new SetupEnvironment.FileItem(urls[1], new File(base, "proot")));
         list.add(new SetupEnvironment.FileItem(urls[2], new File(base, "alpine.tar.gz")));
-        list.add(new SetupEnvironment.FileItem(urls[3], new File(base, "init.sh")));
-		list.add(new SetupEnvironment.FileItem(urls[4], new File(base, "s.sh")));
+        list.add(new SetupEnvironment.FileItem(urls[3], new File(base, "setup.sh")));
+		list.add(new SetupEnvironment.FileItem(urls[4], new File(base, "init.sh")));
         SetupEnvironment.setup(this, list, new SetupEnvironment.Callback() {
             @Override
             public void log(String msg) {
@@ -457,12 +457,12 @@ private void logProcessOutput(Process process) {
             @Override
             public void done() {
                 log("Running script...");
-				   ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
-        log("Script done, shg");
+				   ShellRunner.run("setup.sh",MainActivity.this, MainActivity.this::log, () -> {
+        log("Script done, setup.sh");
         //startp(MainActivity.this);
 		
-		ShellRunner.run("s.sh",MainActivity.this, MainActivity.this::log, () -> {
-        log("Script done, starting proot...");
+		ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
+        log("Script done init.sh, starting proot...");
         startp(MainActivity.this);
     });
 		
