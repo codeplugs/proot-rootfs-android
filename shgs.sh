@@ -1,100 +1,75 @@
-#!/system/bin/sh
+#!/bin/sh
 
-echo "[*] INIT START"
+echo "[*] Initializing Alpine"
 
-# =============================
-# BASE PATH
-# =============================
-FILES_DIR="/data/user/0/com.rootfs.android/files"
-ALPINE_DIR="$FILES_DIR/alpine"
-BIN_DIR="$FILES_DIR/bin"
-LIB_DIR="$FILES_DIR/lib"
+# =========================
+# 🔥 CONFIG ROOTFS PATH
+# =========================
+ALPINE=${ALPINE:-alpine}
+BASE_DIR=${BASE_DIR:-/data/data/com.rootfs.android/files}  # ganti sesuai app kamu
+ALPINE_DIR=${ALPINE_DIR:-$BASE_DIR/$ALPINE}
 
-# fakeroot etc
-ETC="$FILES_DIR/etc"
-HOME_DIR="$FILES_DIR/home"
-TMP="$FILES_DIR/tmp"
+echo "[*] Rootfs path: $ALPINE_DIR"
 
-mkdir -p "$BIN_DIR" "$LIB_DIR" "$TMP"
-mkdir -p "$ETC" "$HOME_DIR"
 
-# =============================
-# HOSTNAME
-# =============================
-echo "android" > "$ETC/hostname"
-export HOSTNAME="android"
+# =========================
+# 🔥 BASIC SYSTEM CONFIG
+# =========================
 
-# =============================
-# PASSWD & GROUP (FAKE)
-# =============================
-cat > "$ETC/passwd" <<EOF
-root:x:0:0:root:$HOME_DIR:/system/bin/sh
+echo "localhost" > "$ALPINE_DIR/etc/hostname"
+
+cat > "$ALPINE_DIR/etc/hosts" << 'EOF'
+127.0.0.1   localhost localhost.localdomain
+::1         localhost localhost.localdomain
 EOF
 
-cat > "$ETC/group" <<EOF
+cat > "$ALPINE_DIR/etc/resolv.conf" << 'EOF'
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+EOF
+
+cat > "$ALPINE_DIR/etc/apk/repositories" << 'EOF'
+https://dl-cdn.alpinelinux.org/alpine/latest-stable/main
+https://dl-cdn.alpinelinux.org/alpine/latest-stable/community
+EOF
+
+# =========================
+# 🔥 REMOVE SETUP-ALPINE
+# =========================
+
+rm -f "$ALPINE_DIR/sbin/setup-alpine"
+rm -rf "$ALPINE_DIR/etc/alpine-release" 2>/dev/null
+
+# =========================
+# 🔥 FIX USER SYSTEM
+# =========================
+
+cat > "$ALPINE_DIR/etc/passwd" << 'EOF'
+root:x:0:0:root:/root:/bin/sh
+EOF
+
+cat > "$ALPINE_DIR/etc/group" << 'EOF'
 root:x:0:
 EOF
 
-# =============================
-# PROFILE (PS1 DISINI 🔥)
-# =============================
-cat > "$ETC/profile" <<EOF
-export PATH=/system/bin:/system/xbin:$BIN_DIR
-export HOME=$HOME_DIR
-export USER=root
-export LOGNAME=root
-export HOSTNAME=android
-export TERM=xterm-256color
-
-# 🔥 PS1
-export PS1='[\u@\h \W]\$ '
-
-cd \$HOME
+cat > "$ALPINE_DIR/etc/shadow" << 'EOF'
+root::0:0:99999:7:::
 EOF
 
-# =============================
-# ENV EXPORT
-# =============================
-export HOME="$HOME_DIR"
-export USER="root"
-export LOGNAME="root"
-export PATH="/system/bin:/system/xbin:$BIN_DIR"
-export TERM="xterm-256color"
-export TMPDIR="$TMP"
-export PREFIX="$FILES_DIR"
 
-# 🔥 PS1 juga di global (kalau dipakai manual shell)
-export PS1='[\u@\h \W]\$ '
+# =========================
+# 🔥 MOTD & PROFILE
+# =========================
+mkdir -p "$ALPINE_DIR/etc/profile.d"
 
-# =============================
-# FILE BASIC
-# =============================
-echo "nameserver 8.8.8.8" > "$ETC/resolv.conf"
+cat > "$ALPINE_DIR/etc/profile.d/prompt.sh" << 'EOF'
+export PS1="localhost:~# "
+EOF
 
-# =============================
-# LIBRARY PATH
-# =============================
-export LD_LIBRARY_PATH="$LIB_DIR:/system/lib64:/system/lib"
+# =========================
+# 🔥 INIT FLAG
+# =========================
 
-# =============================
-# DEBUG
-# =============================
-echo "[*] HOSTNAME: $HOSTNAME"
-echo "[*] HOME: $HOME"
-echo "[*] PWD: $(pwd)"
-echo "[*] PATH: $PATH"
+touch "$ALPINE_DIR/root/.initialized"
 
-# =============================
-# TEST (OPSIONAL)
-# =============================
-if [ -f "$BIN_DIR/busybox" ]; then
-    "$BIN_DIR/busybox" echo "[*] BusyBox OK"
-else
-    echo "[!] busybox tidak ditemukan"
-fi
-
-# =============================
-# DONE (NO SHELL)
-# =============================
-echo "[*] INIT DONE"
-exit 0
+echo "[*] Alpine rootfs ready"

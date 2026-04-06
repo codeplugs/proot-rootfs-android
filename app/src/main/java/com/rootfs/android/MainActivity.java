@@ -64,11 +64,7 @@ String nativeLibDir = getApplicationContext().getApplicationInfo().nativeLibrary
         }
 
 
-
-
-        btn.setOnClickListener(v -> start());
-		
-		    try {
+try {
 		Process process = Runtime.getRuntime().exec(
                     new String[]{"sh", "-c", "ls -l " + getFilesDir().getAbsolutePath() + "/ 2>&1"}
             );
@@ -88,6 +84,10 @@ String nativeLibDir = getApplicationContext().getApplicationInfo().nativeLibrary
             output.append("LS Error: " + e.getMessage()+ "\n");
         }
 		
+
+        btn.setOnClickListener(v -> start());
+		
+		    
 		
 		
 		
