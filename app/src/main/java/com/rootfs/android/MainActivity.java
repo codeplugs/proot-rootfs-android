@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
-
+import android.widget.ScrollView;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -32,12 +32,14 @@ import java.lang.reflect.Field;
 public class MainActivity extends AppCompatActivity {
 
     TextView output;
-
+    ScrollView scrollView;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+         
+		scrollView = findViewById(R.id.outputs);
         output = findViewById(R.id.output);
         Button btn = findViewById(R.id.btnStart);
 
@@ -100,6 +102,12 @@ try {
 
     private void log(String s) {
         runOnUiThread(() -> output.append(s + "\n"));
+		scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 
 
@@ -281,6 +289,7 @@ private void logProcessOutput(Process process) {
                 cmd.add("-w"); cmd.add("/root");
 
                 cmd.add("-b"); cmd.add("/dev");
+				cmd.add("-b"); cmd.add("/dev/pts");
                 //cmd.add("-b"); cmd.add("/proc");
                 cmd.add("-b"); cmd.add("/sys");
                 cmd.add("-b"); cmd.add("/sdcard");
@@ -302,7 +311,33 @@ private void logProcessOutput(Process process) {
                   cmd.add("/bin/sh");
 				  cmd.add("-c");
 				  // seluruh perintah satu string
-                  cmd.add("apk update && apk add alpine-base && apk add expect && exec unbuffer /bin/sh -l");
+                 cmd.add(
+    "apk update && " +
+    "apk upgrade && " +
+    "apk add alpine-base expect bash dropbear openssh-client sshpass && " +
+
+    // tampilkan motd saja (tidak buat)
+    "cat /etc/motd 2>/dev/null; " +
+
+    // set PS1 sementara (tidak simpan ke file)
+    //"export PS1='localhost:~# '; " +
+   // 🔥 FORCE SET PASSWORD (INI YANG FIX)
+   "passwd -d root; " +
+    //"(echo 'fgkjfGS87676Jn'; echo 'fgkjfGS87676Jn') | passwd root; " +
+"dropbear -R -E -B -p 2222 & " +
+    // FIX: auto generate hostkey
+    //"dropbear -R -E -p 2222 & " +
+
+    "sleep 1; " +
+
+     // 🔥 paksa muncul prompt
+    "ssh -T -o StrictHostKeyChecking=no root@localhost -p 2222 " +
+    "exec /bin/busybox"
+    //"ssh -tt -o StrictHostKeyChecking=no root@localhost -p 2222"
+    // masuk shell login
+    //"exec /bin/bash -i"
+);
+                //"exec /bin/busybox"
                   //cmd.add("-l");
 				 
 				 //cmd.add("/bin/sh");
@@ -352,7 +387,7 @@ private void logProcessOutput(Process process) {
                             new InputStreamReader(process.getInputStream()))) {
                         String line;
                         while ((line = reader.readLine()) != null) {
-                          log("[OUT] " + line);
+                          log(line);
                         }
                     } catch (Exception e) {
                         log("stdout error"+ e);
@@ -428,7 +463,7 @@ private void logProcessOutput(Process process) {
 		
 		ShellRunner.run("s.sh",MainActivity.this, MainActivity.this::log, () -> {
         log("Script done, starting proot...");
-        //startp(MainActivity.this);
+        startp(MainActivity.this);
     });
 		
 		
