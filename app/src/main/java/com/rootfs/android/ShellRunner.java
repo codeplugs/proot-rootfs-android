@@ -9,10 +9,10 @@ public class ShellRunner {
         void log(String line);
     }
 
-    public static void run(Context ctx, Output out) {
+    public static void run(String file, Context ctx, Output out) {
         new Thread(() -> {
             try {
-                File script = new File(ctx.getFilesDir(), "init.sh");
+                File script = new File(ctx.getFilesDir(), file);
 
                 Process p = new ProcessBuilder(
                         "/system/bin/sh",

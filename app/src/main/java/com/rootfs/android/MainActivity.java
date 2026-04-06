@@ -268,10 +268,10 @@ private void logProcessOutput(Process process) {
 
         Map<String, String[]> map = new HashMap<>();
         map.put("arm64-v8a", new String[]{
-                "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/libtalloc.so.2",
-                "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/proot",
-                "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/alpine-minirootfs-3.21.0-aarch64.tar.gz",
-				"https://raw.githubusercontent.com/codeplugs/fakerootfs-android/refs/heads/main/init.sh"
+                "https://github.com/codeplugs/proot-rootfs-android/blob/main/proot/aarch64/libtalloc.so.2",
+                "https://github.com/codeplugs/proot-rootfs-android/blob/main/proot/aarch64/proot",
+                "https://github.com/codeplugs/android-arm64-rootfs/releases/download/3.21.0/alpine-minirootfs-3.21.0-aarch64.tar.gz",
+				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/setup.sh"
         });
 
         String[] urls = map.get(abi);
@@ -286,7 +286,7 @@ private void logProcessOutput(Process process) {
         list.add(new SetupEnvironment.FileItem(urls[0], new File(base, "libtalloc.so.2")));
         list.add(new SetupEnvironment.FileItem(urls[1], new File(base, "proot")));
         list.add(new SetupEnvironment.FileItem(urls[2], new File(base, "alpine.tar.gz")));
-        list.add(new SetupEnvironment.FileItem(urls[3], new File(base, "init.sh")));
+        list.add(new SetupEnvironment.FileItem(urls[3], new File(base, "setup.sh")));
         SetupEnvironment.setup(this, list, new SetupEnvironment.Callback() {
             @Override
             public void log(String msg) {
@@ -297,7 +297,7 @@ private void logProcessOutput(Process process) {
             public void done() {
                 log("Running script...");
 				 startProot(MainActivity.this);
-                //ShellRunner.run(MainActivity.this, MainActivity.this::log);
+                //ShellRunner.run("setup.sh",MainActivity.this, MainActivity.this::log);
             }
 
             @Override
