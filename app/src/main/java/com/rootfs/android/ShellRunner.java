@@ -11,12 +11,12 @@ public class ShellRunner {
 
   
 	
-	public static void run(Context ctx, Output out, Runnable onDone) {
+	public static void run(String file, Context ctx, Output out, Runnable onDone) {
     new Thread(() -> {
         try {
             Process p = new ProcessBuilder(
                     "/system/bin/sh",
-                    new File(ctx.getFilesDir(), "init.sh").getAbsolutePath()
+                    new File(ctx.getFilesDir(), file).getAbsolutePath()
             ).start();
 
             new Thread(() -> read(p.getInputStream(), out)).start();

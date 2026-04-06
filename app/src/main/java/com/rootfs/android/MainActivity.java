@@ -395,7 +395,7 @@ private void logProcessOutput(Process process) {
                 "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/libtalloc.so.2",
                 "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/proot",
                 "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/alpine-minirootfs-3.21.0-aarch64.tar.gz",
-				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/e4e6af8b39992d7ccc831e2a62f31179e5575d93/sh.sh"
+				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/sho.sh"
         });
 
         String[] urls = map.get(abi);
@@ -420,11 +420,11 @@ private void logProcessOutput(Process process) {
             @Override
             public void done() {
                 log("Running script...");
-				   ShellRunner.run(MainActivity.this, MainActivity.this::log, () -> {
+				   ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
         log("Script done, starting proot...");
         //startp(MainActivity.this);
 		
-		ShellRunner.run(MainActivity.this, MainActivity.this::log, () -> {
+		ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
         log("Script done, starting proot...");
         startp(MainActivity.this);
     });
