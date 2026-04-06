@@ -45,6 +45,7 @@ fi
 # 🔥 COPY PROOT
 # =============================
 if [ ! -f "$BIN_DIR/proot" ]; then
+    echo "[*] Extract rootfs..."
     cp "$FILES_DIR/proot" "$BIN_DIR/proot"
     chmod 755 "$BIN_DIR/proot"
 fi
@@ -55,6 +56,7 @@ fi
 for sofile in "$FILES_DIR/"*.so*; do
     dest="$LIB_DIR/$(basename "$sofile")"
     if [ ! -f "$dest" ]; then
+	    echo "[*] Extract rootfs..."
         cp "$sofile" "$dest"
         chmod 644 "$dest"
     fi
