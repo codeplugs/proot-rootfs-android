@@ -422,11 +422,11 @@ private void logProcessOutput(Process process) {
             @Override
             public void done() {
                 log("Running script...");
-				   ShellRunner.run("s.sh",MainActivity.this, MainActivity.this::log, () -> {
+				   ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
         log("Script done, shg");
         //startp(MainActivity.this);
 		
-		ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
+		ShellRunner.run("s.sh",MainActivity.this, MainActivity.this::log, () -> {
         log("Script done, starting proot...");
         //startp(MainActivity.this);
     });

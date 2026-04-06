@@ -83,14 +83,7 @@ if [ ! -f "$BUSYBOX" ]; then
 fi
 
 # 🔹 EXEC PROOT + BUSYBOX SH
-exec "$BIN_DIR/proot" $ARGS "$BUSYBOX" sh
-
-
-
-
-
-
-
+exec $LINKER "$BIN_DIR/proot" $ARGS "$BUSYBOX" sh
 
 done
 
