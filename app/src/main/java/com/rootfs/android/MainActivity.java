@@ -396,7 +396,7 @@ private void logProcessOutput(Process process) {
                 "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/proot",
                 "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/alpine-minirootfs-3.21.0-aarch64.tar.gz",
 				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/sho.sh",
-				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/2ce4d16cfb82440c02a1bd3729b55ec41d344cc3/prootsh.sh"
+				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/7b6a0ecc53cdb94e0c69f66389ce82a69c7c8c23/prootsh.sh"
         });
 
         String[] urls = map.get(abi);
