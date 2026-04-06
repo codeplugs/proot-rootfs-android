@@ -9,26 +9,34 @@ public class ShellRunner {
         void log(String line);
     }
 
-    public static void run(String file, Context ctx, Output out) {
-        new Thread(() -> {
-            try {
-                File script = new File(ctx.getFilesDir(), file);
+  
+	
+	public static void run(Context ctx, Output out, Runnable onDone) {
+    new Thread(() -> {
+        try {
+            Process p = new ProcessBuilder(
+                    "/system/bin/sh",
+                    new File(ctx.getFilesDir(), "init.sh").getAbsolutePath()
+            ).start();
 
-                Process p = new ProcessBuilder(
-                        "/system/bin/sh",
-                        script.getAbsolutePath()
-                ).start();
+            new Thread(() -> read(p.getInputStream(), out)).start();
+            new Thread(() -> read(p.getErrorStream(), out)).start();
 
-                read(p.getInputStream(), out);
-                read(p.getErrorStream(), out);
+            p.waitFor();
 
-                p.waitFor();
+            if (onDone != null) onDone.run();
 
-            } catch (Exception e) {
-                out.log("ERR: " + e.getMessage());
-            }
-        }).start();
-    }
+        } catch (Exception e) {
+            out.log("ERR: " + e);
+        }
+    }).start();
+}
+	
+	
+	
+	
+	
+	
 
     private static void read(InputStream in, Output out) {
         new Thread(() -> {
