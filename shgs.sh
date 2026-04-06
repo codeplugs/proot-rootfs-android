@@ -1,89 +1,100 @@
 #!/system/bin/sh
 
+echo "[*] INIT START"
+
 # =============================
-# 🔥 BASE PATH
+# BASE PATH
 # =============================
 FILES_DIR="/data/user/0/com.rootfs.android/files"
 ALPINE_DIR="$FILES_DIR/alpine"
 BIN_DIR="$FILES_DIR/bin"
 LIB_DIR="$FILES_DIR/lib"
 
-mkdir -p "$ALPINE_DIR" "$BIN_DIR" "$LIB_DIR"
+# fakeroot etc
+ETC="$FILES_DIR/etc"
+HOME_DIR="$FILES_DIR/home"
+TMP="$FILES_DIR/tmp"
+
+mkdir -p "$BIN_DIR" "$LIB_DIR" "$TMP"
+mkdir -p "$ETC" "$HOME_DIR"
 
 # =============================
-# 🔥 ENV
+# HOSTNAME
 # =============================
+echo "android" > "$ETC/hostname"
+export HOSTNAME="android"
 
-export PATH="/system/bin:/system/xbin:$BIN_DIR:/sbin:/vendor/bin"
+# =============================
+# PASSWD & GROUP (FAKE)
+# =============================
+cat > "$ETC/passwd" <<EOF
+root:x:0:0:root:$HOME_DIR:/system/bin/sh
+EOF
 
-export HOME="/root"
+cat > "$ETC/group" <<EOF
+root:x:0:
+EOF
 
+# =============================
+# PROFILE (PS1 DISINI 🔥)
+# =============================
+cat > "$ETC/profile" <<EOF
+export PATH=/system/bin:/system/xbin:$BIN_DIR
+export HOME=$HOME_DIR
+export USER=root
+export LOGNAME=root
+export HOSTNAME=android
+export TERM=xterm-256color
 
-export BIN="$BIN_DIR"
+# 🔥 PS1
+export PS1='[\u@\h \W]\$ '
+
+cd \$HOME
+EOF
+
+# =============================
+# ENV EXPORT
+# =============================
+export HOME="$HOME_DIR"
+export USER="root"
+export LOGNAME="root"
+export PATH="/system/bin:/system/xbin:$BIN_DIR"
+export TERM="xterm-256color"
+export TMPDIR="$TMP"
 export PREFIX="$FILES_DIR"
 
-# TMP
-TMPDIR="$FILES_DIR/tmp"
-mkdir -p "$TMPDIR"
-export TMPDIR="$TMPDIR"
-
-# PROOT TMP
-PROOT_TMP_DIR="$TMPDIR/proot"
-mkdir -p "$PROOT_TMP_DIR"
-export PROOT_TMP_DIR
-
+# 🔥 PS1 juga di global (kalau dipakai manual shell)
+export PS1='[\u@\h \W]\$ '
 
 # =============================
-# 🔥 EXTRACT ROOTFS
+# FILE BASIC
 # =============================
-echo "[*] Extract tai"
+echo "nameserver 8.8.8.8" > "$ETC/resolv.conf"
 
 # =============================
-# 🔥 COPY PROOT
+# LIBRARY PATH
 # =============================
-echo "[*] Extract tai"
+export LD_LIBRARY_PATH="$LIB_DIR:/system/lib64:/system/lib"
 
 # =============================
-# 🔥 proot
+# DEBUG
 # =============================
+echo "[*] HOSTNAME: $HOSTNAME"
+echo "[*] HOME: $HOME"
+echo "[*] PWD: $(pwd)"
+echo "[*] PATH: $PATH"
 
-# LINKER
-if [ -f "/system/bin/linker64" ]; then
-    LINKER="/system/bin/linker64"
+# =============================
+# TEST (OPSIONAL)
+# =============================
+if [ -f "$BIN_DIR/busybox" ]; then
+    "$BIN_DIR/busybox" echo "[*] BusyBox OK"
 else
-    LINKER="/system/bin/linker"
+    echo "[!] busybox tidak ditemukan"
 fi
 
-export LINKER
-
-# Pastikan rootfs ada
-mkdir -p "$ALPINE_DIR"
-mkdir -p "$ALPINE_DIR/tmp"
-chmod 1777 "$ALPINE_DIR/tmp"
-
-# PROOT ARGS
-ARGS="--kill-on-exit"
-ARGS="$ARGS -w /root"
-ARGS="$ARGS -b /dev"
-ARGS="$ARGS -b /proc"
-ARGS="$ARGS -b /sys"
-ARGS="$ARGS -b /sdcard"
-ARGS="$ARGS -b /storage"
-ARGS="$ARGS -b /data"
-ARGS="$ARGS -b $ALPINE_DIR/tmp:/dev/shm"
-ARGS="$ARGS -r $ALPINE_DIR -0 --link2symlink --sysvipc"
-
-echo "[*] Starting Alpine with BusyBox..."
-
-# 🔹 PASTIKAN PATH BUSYBOX BENAR
-BUSYBOX="$ALPINE_DIR/bin/busybox"
-if [ ! -f "$BUSYBOX" ]; then
-    echo "[!] BusyBox not found at $BUSYBOX"
-    exit 1
-fi
-
-# 🔹 EXEC PROOT + BUSYBOX SH
-exec $LINKER "$BIN_DIR/proot" $ARGS "$BUSYBOX" sh
-
-done
-
+# =============================
+# DONE (NO SHELL)
+# =============================
+echo "[*] INIT DONE"
+exit 0
