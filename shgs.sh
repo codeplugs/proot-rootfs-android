@@ -9,7 +9,9 @@ FILES_DIR="/data/user/0/com.rootfs.android/files"
 ALPINE_DIR="$FILES_DIR/alpine"
 
 echo "[*] Rootfs path: $ALPINE_DIR"
-
+# TMP
+TMPDIR="$FILES_DIR/tmp"
+export TMPDIR="$TMPDIR"
 
 # =========================
 # 🔥 BASIC SYSTEM CONFIG
