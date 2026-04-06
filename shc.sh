@@ -11,12 +11,14 @@ LIB_DIR="$FILES_DIR/lib"
 mkdir -p "$ALPINE_DIR" "$BIN_DIR" "$LIB_DIR"
 
 # =============================
-# 🔥 ENV (DARI JAVA)
+# 🔥 ENV
 # =============================
 
 export PATH="/system/bin:/system/xbin:$BIN_DIR:/sbin:/vendor/bin"
 
 export HOME="/root"
+
+
 export BIN="$BIN_DIR"
 export PREFIX="$FILES_DIR"
 
@@ -29,21 +31,6 @@ export TMPDIR="$TMPDIR"
 PROOT_TMP_DIR="$TMPDIR/proot"
 mkdir -p "$PROOT_TMP_DIR"
 export PROOT_TMP_DIR
-
-# LIB FIX
-export LD_LIBRARY_PATH="$LIB_DIR:/system/lib64:/system/lib"
-
-# LINKER FIX
-if [ -f "/system/bin/linker64" ]; then
-    LINKER="/system/bin/linker64"
-else
-    LINKER="/system/bin/linker"
-fi
-export LINKER
-
-# APP INFO
-export PKG="com.rootfs.android"
-export DEBUG="false"
 
 
 # =============================
@@ -72,3 +59,4 @@ for sofile in "$FILES_DIR/"*.so*; do
         chmod 644 "$dest"
     fi
 done
+
