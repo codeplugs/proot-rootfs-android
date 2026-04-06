@@ -1,6 +1,6 @@
 FILES_DIR="/data/user/0/com.rootfs.android/files"
 BIN_DIR="$FILES_DIR/bin"
-
+ALPINE_DIR="$FILES_DIR/alpine"
 
 # LINKER FIX
 if [ -f "/system/bin/linker64" ]; then
