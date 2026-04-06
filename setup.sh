@@ -1,5 +1,8 @@
 #!/system/bin/sh
 
+set -e
+set -x
+
 # =============================
 # 🔥 BASE PATH
 # =============================
@@ -11,64 +14,70 @@ LIB_DIR="$FILES_DIR/lib"
 mkdir -p "$ALPINE_DIR" "$BIN_DIR" "$LIB_DIR"
 
 # =============================
-# 🔥 ENV (DARI JAVA)
+# 🔥 ENV
 # =============================
-
-export PATH="/system/bin:/system/xbin:$BIN_DIR:/sbin:/vendor/bin"
+export PATH="/system/bin:/system/xbin:/sbin:/vendor/bin:$BIN_DIR"
 
 export HOME="/root"
-export BIN="$BIN_DIR"
 export PREFIX="$FILES_DIR"
 
 # TMP
 TMPDIR="$FILES_DIR/tmp"
 mkdir -p "$TMPDIR"
-export TMPDIR="$TMPDIR"
+export TMPDIR
 
-# PROOT TMP
+# PROOT TMP (biar konsisten walau belum dipakai)
 PROOT_TMP_DIR="$TMPDIR/proot"
 mkdir -p "$PROOT_TMP_DIR"
 export PROOT_TMP_DIR
 
-# LIB FIX
-export LD_LIBRARY_PATH="$LIB_DIR:/system/lib64:/system/lib"
+# ⚠️ JANGAN AGRESIF
+export LD_LIBRARY_PATH="$LIB_DIR"
 
-# LINKER FIX
-if [ -f "/system/bin/linker64" ]; then
-    LINKER="/system/bin/linker64"
-else
-    LINKER="/system/bin/linker"
-fi
-export LINKER
-
-# APP INFO
-export PKG="com.rootfs.android"
-export DEBUG="false"
-
+# =============================
+# 🔥 DEBUG INFO
+# =============================
+echo "[*] FILES_DIR=$FILES_DIR"
+echo "[*] ALPINE_DIR=$ALPINE_DIR"
 
 # =============================
 # 🔥 EXTRACT ROOTFS
 # =============================
-if [ -z "$(ls -A "$ALPINE_DIR" 2>/dev/null)" ]; then
+if [ ! -f "$ALPINE_DIR/bin/sh" ]; then
     echo "[*] Extract rootfs..."
     tar -xzf "$FILES_DIR/alpine.tar.gz" -C "$ALPINE_DIR"
+else
+    echo "[*] Rootfs already exists"
 fi
 
 # =============================
-# 🔥 COPY PROOT
+# 🔥 COPY PROOT (optional)
 # =============================
-if [ ! -f "$BIN_DIR/proot" ]; then
+if [ -f "$FILES_DIR/proot" ] && [ ! -f "$BIN_DIR/proot" ]; then
+    echo "[*] Copy proot"
     cp "$FILES_DIR/proot" "$BIN_DIR/proot"
     chmod 755 "$BIN_DIR/proot"
 fi
 
 # =============================
-# 🔥 COPY LIB
+# 🔥 COPY LIB (SAFE)
 # =============================
-for sofile in "$FILES_DIR/"*.so*; do
+for sofile in "$FILES_DIR"/*.so*; do
+    [ -e "$sofile" ] || continue
     dest="$LIB_DIR/$(basename "$sofile")"
     if [ ! -f "$dest" ]; then
+        echo "[*] Copy lib $(basename "$sofile")"
         cp "$sofile" "$dest"
         chmod 644 "$dest"
     fi
 done
+
+# =============================
+# 🔥 FINAL CHECK
+# =============================
+echo "[*] DONE SETUP"
+
+ls -l "$FILES_DIR"
+ls -l "$ALPINE_DIR/bin" || true
+
+echo "[*] Script done"
