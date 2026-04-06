@@ -5,9 +5,8 @@ echo "[*] Initializing Alpine"
 # =========================
 # 🔥 CONFIG ROOTFS PATH
 # =========================
-ALPINE=${ALPINE:-alpine}
-BASE_DIR=${BASE_DIR:-/data/data/com.rootfs.android/files}  # ganti sesuai app kamu
-ALPINE_DIR=${ALPINE_DIR:-$BASE_DIR/$ALPINE}
+FILES_DIR="/data/user/0/com.rootfs.android/files"
+ALPINE_DIR="$FILES_DIR/alpine"
 
 echo "[*] Rootfs path: $ALPINE_DIR"
 
