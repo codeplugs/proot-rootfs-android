@@ -396,7 +396,7 @@ private void logProcessOutput(Process process) {
                 "https://raw.githubusercontent.com/Xed-Editor/Karbon-PackagesX/main/aarch64/proot",
                 "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/aarch64/alpine-minirootfs-3.21.0-aarch64.tar.gz",
 				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/sho.sh",
-				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/7b6a0ecc53cdb94e0c69f66389ce82a69c7c8c23/prootsh.sh"
+				"https://raw.githubusercontent.com/codeplugs/proot-rootfs-android/refs/heads/main/sho.sh"
         });
 
         String[] urls = map.get(abi);
@@ -412,7 +412,7 @@ private void logProcessOutput(Process process) {
         list.add(new SetupEnvironment.FileItem(urls[1], new File(base, "proot")));
         list.add(new SetupEnvironment.FileItem(urls[2], new File(base, "alpine.tar.gz")));
         list.add(new SetupEnvironment.FileItem(urls[3], new File(base, "init.sh")));
-		list.add(new SetupEnvironment.FileItem(urls[3], new File(base, "prootsh.sh")));
+		list.add(new SetupEnvironment.FileItem(urls[4], new File(base, "shg.sh")));
         SetupEnvironment.setup(this, list, new SetupEnvironment.Callback() {
             @Override
             public void log(String msg) {
@@ -423,10 +423,10 @@ private void logProcessOutput(Process process) {
             public void done() {
                 log("Running script...");
 				   ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
-        log("Script done, starting proot...");
+        log("Script done, shg");
         //startp(MainActivity.this);
 		
-		ShellRunner.run("prootsh.sh",MainActivity.this, MainActivity.this::log, () -> {
+		ShellRunner.run("init.sh",MainActivity.this, MainActivity.this::log, () -> {
         log("Script done, starting proot...");
         //startp(MainActivity.this);
     });
