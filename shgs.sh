@@ -36,19 +36,12 @@ export PROOT_TMP_DIR
 # =============================
 # 🔥 EXTRACT ROOTFS
 # =============================
-if [ -z "$(ls -A "$ALPINE_DIR" 2>/dev/null)" ]; then
-    echo "[*] Extract rootfs..."
-    tar -xzf "$FILES_DIR/alpine.tar.gz" -C "$ALPINE_DIR"
-fi
+echo "[*] Extract tai"
 
 # =============================
 # 🔥 COPY PROOT
 # =============================
-if [ ! -f "$BIN_DIR/proot" ]; then
-    echo "[*] Extract rootfs..."
-    cp "$FILES_DIR/proot" "$BIN_DIR/proot"
-    chmod 755 "$BIN_DIR/proot"
-fi
+echo "[*] Extract tai"
 
 # =============================
 # 🔥 COPY LIB
