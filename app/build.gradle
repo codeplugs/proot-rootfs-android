@@ -1,0 +1,84 @@
+plugins {
+    id("com.android.application") version "8.1.2"
+    id("com.chaquo.python") version "14.0.2"
+}
+android {
+packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.rootfs.android"
+        minSdkVersion 28
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.1"
+        buildConfigField "long", "BUILT", System.currentTimeMillis() + "L"
+		
+		
+		 ndk {
+            abiFilters "arm64-v8a"
+        }
+ sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+         python {
+            version "3.11"        // Pakai Python 3.11
+         
+            }
+		
+		
+    }
+    signingConfigs {
+        release {
+            storeFile file("cdplg.jks") // lokasi file .jks
+            storePassword "6285782479903"
+            keyAlias "my-key-alias"
+            keyPassword "6285782479903"
+        }
+    }
+    buildTypes {
+        release {
+		    signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+ 
+    }
+    namespace 'com.rootfs.android'
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+
+tasks.register("installAfterAssemble") {
+    doLast {
+        def apkPath = "$buildDir/outputs/apk/debug/app-debug.apk"
+        println "📱 Installing APK..."
+        exec {
+    commandLine "/mnt/c/Users/User/Documents/adb/adb.exe", "install", "-r", apkPath
+}
+
+    }
+}
+
+afterEvaluate {
+    tasks.named("assembleDebug").configure {
+        finalizedBy("installAfterAssemble")
+    }
+}

@@ -1,0 +1,5 @@
+// root build.gradle (Bersih, TANPA buildscript, TANPA repositories)
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
