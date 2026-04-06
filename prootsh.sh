@@ -35,4 +35,4 @@ ARGS="$ARGS --sysvipc"
 
 echo "[*] Starting Alpine with BusyBox..."
 
-exec $LINKER "$BIN_DIR/proot" $ARGS /bin/sh -l -c "busybox"
+exec $LINKER "$BIN_DIR/proot" $ARGS /bin/busybox"
